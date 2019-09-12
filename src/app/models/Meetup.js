@@ -20,6 +20,10 @@ class Meetup extends Model {
     );
     return this;
   }
+
+  static associate(model) {
+    this.belongsTo(model.User, { foreignKey: 'user_id' });
+  }
 }
 
 export default new Meetup();
