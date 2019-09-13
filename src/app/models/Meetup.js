@@ -26,4 +26,4 @@ class Meetup extends Model {
   }
 }
 
-export default new Meetup();
+export default Meetup;
