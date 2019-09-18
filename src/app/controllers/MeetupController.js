@@ -11,6 +11,14 @@ class MeetupController {
     if (!meetup) {
       return res.status(404).json({ error: 'Meetup not found' });
     }
+
+    if (meetup.past) {
+      return res.status(400).json({ error: "Can't delete past meetups" });
+    }
+
+    await meetup.destroy();
+
+    return res.send();
   }
 
   async update(req, res) {
