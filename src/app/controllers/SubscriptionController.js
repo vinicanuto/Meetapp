@@ -1,7 +1,8 @@
 import User from '../models/User';
 import Meetup from '../models/Meetup';
 import Subscription from '../models/Subscription';
-import Mail from '../../lib/Mail';
+import Queue from '../../lib/Queue';
+import SubscriptionMail from '../jobs/SubscriptionMail';
 
 class SubscriptionController {
   async store(req, res) {
@@ -46,16 +47,15 @@ class SubscriptionController {
       meetup_id: meetup.id,
     });
 
-    await Mail.sendMail({
-      to: `${meetup.User.name} <${meetup.User.email}>`,
-      subject: `Novo Inscrito no meetup ${meetup.title}`,
-      template: 'subscription',
-      context: {
-        organizer: meetup.User.name,
-        meetup: meetup.title,
-        user: user.name,
-        email: user.email,
-      },
+    /** Vamos utilizar o Redis
+    (banco Chave X Valor) para fazer o
+    controle da fila de e-mails
+     */
+
+    /** Passamos a chave do job, e os objetos */
+    await Queue.add(SubscriptionMail.key, {
+      meetup,
+      user,
     });
 
     return res.json(subscription);
